@@ -1,29 +1,25 @@
-let actualPosition
-let standartPosition = {}
+let actualPosition = {}
 let setaesquerda = document.getElementById("setaesquerda")
 let setadireita = document.getElementById("setadireita")
 let contadorFoto = 0
 let newUrl
+let submitButton = document.getElementById("submit")
+let formText = document.getElementById("form")
+let searchedWord = ""
 
 function success(pos) {
     actualPosition = pos.coords;
+    console.log(actualPosition.longitude)
+    console.log(actualPosition.latitude)
+    upadeteLink(actualPosition, searchedWord)
 
-    console.log('Sua posição atual é:');
-    console.log('Latitude : ' + actualPosition.latitude);
-    console.log('Longitude: ' + actualPosition.longitude);
-    console.log('Aproximadamente ' + actualPosition.accuracy + ' metros.');
 };
 
 function error(err) {
-    standartPosition.latitude = 47.542565
-    standartPosition.longitude = 12.921156
-    standartPosition.accuracy = 750
-    console.log('Sua posição atual é:');
-    console.log('Latitude : ' + standartPosition.latitude);
-    console.log('Longitude: ' + standartPosition.longitude);
-    console.log('Aproximadamente ' + standartPosition.accuracy + ' metros.');
     console.warn('ERROR(' + err.code + '): ' + err.message);
-
+    actualPosition.latitude = 52.466167
+    actualPosition.longitude = -7.694979
+    upadeteLink(actualPosition, searchedWord)
 };
 
 function constructImageURL(photoObj) {
@@ -33,17 +29,35 @@ function constructImageURL(photoObj) {
 }
 
 navigator.geolocation.getCurrentPosition(success, error);
-fetch("https://shrouded-mountain-15003.herokuapp.com/https://www.flickr.com/services/rest/?api_key=4db46ebd743a9b2ad1c47323755bb695&format=json&nojsoncallback=1&method=flickr.photos.search&safe_search=1&per_page=5&lat=-25.4284&lon=-49.2733&text=oi")
-    .then(responseObject => responseObject.json())
-    .then(hydratedBody => {
-        newUrl = hydratedBody
-        console.log(hydratedBody)
-        const imageUrl = constructImageURL(hydratedBody.photos.photo[0]);
-        console.log(imageUrl)
-        document.getElementById("foto").src = imageUrl
 
 
-    })
+function createNewLink(hydratedBody) {
+    newUrl = hydratedBody
+    console.log(hydratedBody.photos.photo)
+    if (hydratedBody.photos.photo.length === 0) {
+        alert("Não existem fotos na sua região")
+        let newPosition = {}
+        newPosition.latitude = 52.466167
+        newPosition.longitude = -7.694979
+        searchedWord = ""
+        console.log(newPosition)
+        return upadeteLink(newPosition, searchedWord)
+    }
+    const imageUrl = constructImageURL(hydratedBody.photos.photo[0]);
+    document.getElementById("foto").src = imageUrl
+}
+
+
+
+
+function upadeteLink(actualPosition, searchedWord) {
+    console.log(searchedWord)
+    fetch(`https://shrouded-mountain-15003.herokuapp.com/https://flickr.com/services/rest/?api_key=4db46ebd743a9b2ad1c47323755bb695&format=json&nojsoncallback=1&method=flickr.photos.search&safe_search=1&per_page=5&lat=${actualPosition.latitude}&lon=${actualPosition.longitude}&text=${searchedWord}`)
+        .then(responseObject => responseObject.json())
+        .then(hydratedBody => {
+            createNewLink(hydratedBody, actualPosition)
+        })
+}
 
 setadireita.addEventListener("click", function () {
     if (contadorFoto < 4) {
@@ -69,4 +83,9 @@ setaesquerda.addEventListener("click", function () {
         imageUrl = constructImageURL(newUrl.photos.photo[contadorFoto]);
         document.getElementById("foto").src = imageUrl
     }
+})
+
+submitButton.addEventListener("click", function () {
+    searchedWord = formText.value
+    upadeteLink(actualPosition, searchedWord)
 })

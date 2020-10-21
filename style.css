@@ -8,6 +8,19 @@ body {
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
+#form {
+    border: black solid 2px;
+    width : 35vw;
+    height: 1.2rem;
+}
+
+#submit {
+    width           : 10vw;
+    height          : 1.6rem;
+    background-color: white;
+    border          : black solid 2px;
+}
+
 #conteudo {
     display        : flex;
     justify-content: center;
@@ -40,8 +53,9 @@ body {
 }
 
 img {
-    width : 50%;
-    height: 50%;
+    width     : 50%;
+    height    : 50%;
+    object-fit: contain;
 }
 
 #fotobackground {
@@ -86,5 +100,9 @@ img {
     #fotobackground {
         height: 30vh;
         width : 70vw;
+    }
+
+    #submit {
+        width: 25vw;
     }
 }
